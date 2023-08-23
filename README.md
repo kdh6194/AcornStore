@@ -105,7 +105,7 @@ System.out.print("여기에 작성하면 되요");
 Click [Swagger]()
 
 **노션 주소**
-Click [Notion](https://www.notion.so/AcornStore-892531ed392d4e5e96c4a89a1f339942)
+Click [Notion]([https://www.notion.so/AcornStore-892531ed392d4e5e96c4a89a1f339942](https://www.notion.so/AcornStore-892531ed392d4e5e96c4a89a1f339942?pvs=4))
 
 ### Reference Documentation
 
