@@ -1,0 +1,48 @@
+server:
+  port: 3000
+  servlet:
+    context-path: /
+
+spring:
+  mvc:
+    view:
+      prefix: /WEB-INF/views/
+      suffix: .jsp
+  servlet:
+    jsp:
+      init-parameters:
+        development: true
+  datasource:
+    url: jdbc:mariadb://localhost:3306/supercoding
+    driver-class-name: org.mariadb.jdbc.Driver
+    username: cos
+    password: cos1234
+#  h2:
+#    console:
+#      enabled: true
+#      path: /h2-console
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+  profiles:
+    active: dev
+
+
+
+
+#mariaDB
+#spring.datasource.driver-class-name=org.mariadb.jdbc.Driver
+#spring.datasource.url=jdbc:mariadb://localhost:3306/local
+#spring.datasource.username=cos
+#spring.datasource.password=cos1234
+
+
+
+
+
+
+
+
+#twilio.accountSid=YOUR_TWILIO_ACCOUNT_SID
+#twilio.authToken=YOUR_TWILIO_AUTH_TOKEN
