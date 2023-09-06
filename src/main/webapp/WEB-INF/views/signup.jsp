@@ -26,14 +26,14 @@
                     <!--로고end-->
 
                     <!--회원가입 인풋-->
-                    <form class="login__input" action="/auth/signup" method="post">
+                    <form class="login__input" action="/auth/signup" method="post" enctype="multipart/form-data">
                         <input type="email" name="email" placeholder="이메일" required="required" />
                         <input type="password" name="password" placeholder="비밀번호" required="required" />
-                        <input type="text" name="phone" placeholder="전화번호" required="required" />
-                        <input type="text" name="address" placeholder="주소" required="required" />
-                        <input type="text" name="gender" placeholder="성별" required="required" />
-                        <input type="text" name="about_me" placeholder="간단한 소개" required="required" />
-                        <input type="file" name="profileImg" placeholder="프로필 이미지" required="required" />
+                        <input type="text" name="phone" placeholder="전화번호"  />
+                        <input type="text" name="address" placeholder="주소"  />
+                        <input type="text" name="gender" placeholder="성별"  />
+                        <input type="text" name="about_me" placeholder="간단한 소개"  />
+                        <input type="file" name="profileImg" placeholder="프로필 이미지"  />
                         <button>가입</button>
                     </form>
                     <!--회원가입 인풋end-->
