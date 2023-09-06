@@ -28,6 +28,8 @@ public class JwtService {
         Claims claims = Jwts.claims().setSubject(subject);
         claims.put("userId", String.valueOf(userDTO.getId()));
         claims.put("email", userDTO.getEmail());
+        System.out.println("userId"+ userDTO.getId());
+        System.out.println("email"+ userDTO.getEmail());
 
         return Jwts.builder()
                 .setClaims(claims)
@@ -53,6 +55,7 @@ public class JwtService {
 //    }
 
     public String validateAndGetUserId(String token){
+        System.out.println(token);
         try {
             Claims claims = Jwts.parser()
                     .setSigningKey(secretKey)
@@ -69,8 +72,10 @@ public class JwtService {
             if (!"AcornUsers".equals(audience)) {
                 throw new JwtException("Invalid audience");
             }
+            System.out.println("토큰클레임 " + claims.getSubject());
 
-            return claims.getSubject();
+            //return claims.getSubject();
+            return (String)claims.get("userId");
 
         }catch (ExpiredJwtException e) {
             // 토큰이 만료되었을 때의 예외 처리

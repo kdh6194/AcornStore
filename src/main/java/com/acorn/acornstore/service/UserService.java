@@ -55,6 +55,10 @@ public class UserService {
         });
         if(passwordEncoder.matches(password, user.getPassword())){
             resetLoginFailures(email);
+
+            // User DTO에 ID 값 설정
+            userDTO.setId(user.getId());
+
             String token = jwtService.create(userDTO);
             return token;
         }else{

@@ -2,6 +2,7 @@ package com.acorn.acornstore.service;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,10 +40,10 @@ public class S3Uploader {
             //String fileName = generateFileName(file); // 파일내임
             try {
                 //uploadFile(fileName, file);
-                File uploadFile = convert(file)
-                        .orElseThrow(() -> new IllegalArgumentException("MultipartFile -> File로 전환이 실패했습니다."));
-                String fileUrl = upload(uploadFile, dirName);
-                removeNewFile(uploadFile); // 파일 업로드 후 로컬에 저장된 파일 삭제
+//                File uploadFile = convert(file)
+//                        .orElseThrow(() -> new IllegalArgumentException("MultipartFile -> File로 전환이 실패했습니다."));
+                String fileUrl = upload(file, dirName);
+                //removeNewFile(uploadFile); // 파일 업로드 후 로컬에 저장된 파일 삭제
                 fileUrls.add(fileUrl);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -59,25 +60,41 @@ public class S3Uploader {
 //    private String generateFileName(MultipartFile file) {
 //        return System.currentTimeMillis() + "_" + file.getOriginalFilename();
 //    }
+private String upload(MultipartFile multipartFile, String dirName) throws IOException {
+    UUID uuid = UUID.randomUUID();
+    String originName = multipartFile.getOriginalFilename();
+    String fileName = dirName + "/" + uuid + "_" + originName;
 
-    private String upload(File uploadFile, String dirName) {
-        UUID uuid = UUID.randomUUID();
-        String originName = uploadFile.getName();
-        String imageFileName = dirName + "/" + uuid + "_" + originName;
-        String uploadImageUrl = putS3(uploadFile, imageFileName);
-        removeNewFile(uploadFile);
-        return uploadImageUrl;
-//
-//        String fileName = dirName + "/" + uuid.toString() + "_" + originName;
-//
-//        PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, fileName,
-//                new FileInputStream(uploadFile))
-//                .withCannedAcl(CannedAccessControlList.PublicRead);
-//
-//        amazonS3Client.putObject(putObjectRequest);
-//
-//        return amazonS3Client.getUrl(bucketName, fileName).toString();
-    }
+    ObjectMetadata metadata = new ObjectMetadata();
+    metadata.setContentType(multipartFile.getContentType());
+    metadata.setContentLength(multipartFile.getSize());
+
+    PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, fileName,
+            multipartFile.getInputStream(), metadata)
+            .withCannedAcl(CannedAccessControlList.PublicRead);
+
+    amazonS3Client.putObject(putObjectRequest);
+
+    return amazonS3Client.getUrl(bucketName, fileName).toString();
+}
+//    private String upload(File uploadFile, String dirName) {
+//        UUID uuid = UUID.randomUUID();
+//        String originName = uploadFile.getName();
+//        String imageFileName = dirName + "/" + uuid + "_" + originName;
+//        String uploadImageUrl = putS3(uploadFile, imageFileName);
+//        removeNewFile(uploadFile);
+//        return uploadImageUrl;
+////
+////        String fileName = dirName + "/" + uuid.toString() + "_" + originName;
+////
+////        PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, fileName,
+////                new FileInputStream(uploadFile))
+////                .withCannedAcl(CannedAccessControlList.PublicRead);
+////
+////        amazonS3Client.putObject(putObjectRequest);
+////
+////        return amazonS3Client.getUrl(bucketName, fileName).toString();
+//    }
 
     private String putS3(File uploadFile, String fileName) {
         amazonS3Client.putObject(new PutObjectRequest(bucketName, fileName, uploadFile).withCannedAcl(CannedAccessControlList.PublicRead));
@@ -93,19 +110,28 @@ public class S3Uploader {
     }
 
     private Optional<File> convert(MultipartFile file) {
-        File convertFile = new File(file.getOriginalFilename());
-        try {
-            if(convertFile.createNewFile()) {
-                try (FileOutputStream fos = new FileOutputStream(convertFile)) {
-                    fos.write(file.getBytes());
-                }
-                return Optional.of(convertFile);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+//        File convertFile = new File(file.getOriginalFilename());
+//        try {
+//            if(convertFile.createNewFile()) {
+//                try (FileOutputStream fos = new FileOutputStream(convertFile)) {
+//                    fos.write(file.getBytes());
+//                }
+//                return Optional.of(convertFile);
+//            }
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//
+//        return Optional.empty();
 
-        return Optional.empty();
+        try {
+            File convertedFile = File.createTempFile("temp", null);
+            file.transferTo(convertedFile);
+            return Optional.of(convertedFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return Optional.empty();
+        }
     }
 
 //

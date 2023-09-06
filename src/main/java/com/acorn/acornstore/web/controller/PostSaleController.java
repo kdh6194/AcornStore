@@ -6,7 +6,6 @@ import com.acorn.acornstore.web.dto.ProductSaleResDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,11 +20,11 @@ public class PostSaleController {
     @PostMapping("/register")
     public ResponseEntity<ProductSaleResDto> registerProductSale(
             ProductSaleReqDto productSaleReqDto ,
-            @AuthenticationPrincipal UserDetails userDetails) { // 유저 추가
-        System.out.println("유저 뭐로 가져옴?"+userDetails);
+            @AuthenticationPrincipal String userId) { // 유저 추가
+        System.out.println("유저 뭐로 가져옴?"+userId);
 
 
-        ProductSaleResDto result = productSaleService.registerProductSale(userDetails.getUsername(), productSaleReqDto);
+        ProductSaleResDto result = productSaleService.registerProductSale(userId, productSaleReqDto);
 
 
         return ResponseEntity.ok(result);
