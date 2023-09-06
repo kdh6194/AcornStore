@@ -8,9 +8,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -24,7 +26,6 @@ import java.util.Map;
 @Validated
 public class UserController {
     private final UserService userService;
-
     @GetMapping("/signup")
     public String showSignUp(){ // ResponseEntity로 데이터 타입 잡고
 
@@ -37,14 +38,12 @@ public class UserController {
         return "signin";
     }
 
-    // 지금 문제는 프론트에서 가져오는 데이터 타입이
-    // application/json 형식으로 가져와야하는데 그렇고 있지 못한 상황
-    // postman으로 진행하면 문제는 없다.(비밀번호 유효성 검사도 잘 작동함)
-    @PostMapping(value="/signup", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String,String>> signUp(@Valid @RequestBody SignUpDTO signUpDTO){
-        System.out.println("유저" + signUpDTO);
+    @PostMapping(value="/signup", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Map<String,String>> signUp(@Valid @ModelAttribute SignUpDTO signUpDTO, @RequestParam("profileImg")MultipartFile img) {
+        signUpDTO.setProfileImg(img);
+        System.out.println("받아온 유저 정보" + signUpDTO.getEmail());
         User isSignUp = userService.signUp(signUpDTO);
-
+        System.out.println("가입한 유저 정보" + isSignUp.getEmail());
         if (isSignUp != null) {
             return ResponseEntity.ok(Map.of("message", "회원가입이 완료되었습니다."));
         } else {
@@ -52,14 +51,16 @@ public class UserController {
         }
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<Map<String,String>> signIn(@RequestBody UserDTO userDTO, HttpServletResponse httpServletResponse) throws Exception{
+    @PostMapping(value = "/login")
+    public ResponseEntity<Map<String,String>> signIn(@ModelAttribute UserDTO userDTO, HttpServletResponse httpServletResponse) throws Exception{
             String token = userService.login(userDTO);
             Map<String, String> response = new HashMap<>();
-
+            System.out.println("토큰이 헤더에 무엇이 있나?"+httpServletResponse.getHeader("Authorization"));
+        System.out.println("여기엔 무엇이 들어있어???"+token);
         if (token != null) {
             httpServletResponse.setHeader("Authorization", "Bearer " + token);
             response.put("message", "로그인이 성공적으로 완료되었습니다.");
+            System.out.println("토큰이 헤더에 입력되는가?"+httpServletResponse.getHeader("Authorization"));
             return ResponseEntity.ok(response);
         } else {
             response.put("message", "로그인 실패");
