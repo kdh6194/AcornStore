@@ -51,8 +51,8 @@ public class UserController {
         }
     }
 
-    @PostMapping("/login", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Map<String,String>> signIn(@ModelAttribute  UserDTO userDTO, HttpServletResponse httpServletResponse) throws Exception{
+    @PostMapping(value = "/login")
+    public ResponseEntity<Map<String,String>> signIn(@ModelAttribute UserDTO userDTO, HttpServletResponse httpServletResponse) throws Exception{
             String token = userService.login(userDTO);
             Map<String, String> response = new HashMap<>();
             System.out.println("토큰이 헤더에 무엇이 있나?"+httpServletResponse.getHeader("Authorization"));

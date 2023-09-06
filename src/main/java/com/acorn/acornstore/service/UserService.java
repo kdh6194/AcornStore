@@ -37,6 +37,11 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public String login(UserDTO userDTO) {
+        System.out.println("이건 디티오야"+userDTO);
+        System.out.println("이건 디티오 이메일이야"+userDTO.getEmail());
+        if(userDTO == null || userDTO.getEmail() == null ) {
+            throw new RuntimeException("Invalid arguments");
+        }
         String email = userDTO.getEmail();
         String password = userDTO.getPassword();
 
