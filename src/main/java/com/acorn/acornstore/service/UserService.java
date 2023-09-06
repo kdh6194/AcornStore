@@ -6,9 +6,11 @@ import com.acorn.acornstore.web.dto.SignUpDTO;
 import com.acorn.acornstore.web.dto.UserDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -22,6 +24,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+//    private final AuthenticationManager authenticationManager;
 
     // 로그인 실패시 동작하도록 만든 로직 변수
     private Map<String, Integer> loginFailures = new HashMap<>();
@@ -34,6 +37,11 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public String login(UserDTO userDTO) {
+        System.out.println("이건 디티오야"+userDTO);
+        System.out.println("이건 디티오 이메일이야"+userDTO.getEmail());
+        if(userDTO == null || userDTO.getEmail() == null ) {
+            throw new RuntimeException("Invalid arguments");
+        }
         String email = userDTO.getEmail();
         String password = userDTO.getPassword();
 
@@ -63,11 +71,11 @@ public class UserService {
         }
             String email = signUpDTO.getEmail();
             String password = signUpDTO.getPassword();
-            String phone = signUpDTO.getEmail();
-            String address = signUpDTO.getEmail();
-            String gender = signUpDTO.getEmail();
-            String about_me = signUpDTO.getEmail();
-            String profileImg = signUpDTO.getEmail();
+            String phone = signUpDTO.getPhone();
+            String address = signUpDTO.getAddress();
+            String gender = signUpDTO.getGender();
+            String about_me = signUpDTO.getAbout_me();
+            MultipartFile profileImg = signUpDTO.getProfileImg();
 
         if(userRepository.existsByEmail(email)){
             log.error("An error occurred: {}", email);
@@ -88,7 +96,7 @@ public class UserService {
                 .address(address)
                 .gender(gender)
                 .about_me(about_me)
-                .profileImg(profileImg)
+                .profileImg(String.valueOf(profileImg))
                 .build();
 
         return userRepository.save(newUser);
@@ -149,4 +157,5 @@ public class UserService {
                 (hasUpperCase && hasLowerCase && hasDigit &&
                         !password.contains(" "));
     }
+
 }

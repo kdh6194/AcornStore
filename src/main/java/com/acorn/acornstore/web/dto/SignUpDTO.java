@@ -1,12 +1,15 @@
 package com.acorn.acornstore.web.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.lang.Nullable;
+import org.springframework.web.multipart.MultipartFile;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
+@Data
 public class SignUpDTO {
     private String email;
     private String password;
@@ -14,5 +17,6 @@ public class SignUpDTO {
     private String address;
     private String gender;
     private String about_me;
-    private String profileImg;
+    @Nullable
+    private MultipartFile profileImg;
 }

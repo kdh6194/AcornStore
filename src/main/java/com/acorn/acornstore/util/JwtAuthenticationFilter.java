@@ -5,6 +5,7 @@ import com.acorn.acornstore.service.JwtService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContext;
@@ -31,16 +32,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String requestURI = request.getRequestURI();
 
-        // Skip authentication for /signup and other non-secure paths.
         if (requestURI.startsWith("/signup")) {
+            System.out.println("=======여기까지 동작은 함?"); // 동작 안함 - 로직을 새로 살펴보던가 아니면 리뉴얼을 해야겠다.
             filterChain.doFilter(request, response);
             return;
         }
 
         try {
+            System.out.println("response 헤더에 저장한 토큰"+response.getHeader("Authorization"));
+            System.out.println("request 헤더에 저장한 토큰"+request.getHeader("Authorization"));
             // 요청에서 토큰 가져오기.
             String token = parseBearerToken(request);
+            System.out.println("토큰 값이라는데 있긴한가?"+token);
             log.info("Filter is running...");
+            System.out.println("=======여기까지 동작은 함?");
             // 토큰 검사하기. JWT이므로 인가 서버에 요청 하지 않고도 검증 가능.
             if (token != null && !token.equalsIgnoreCase("null")) {
                 // userId 가져오기. 위조 된 경우 예외 처리 된다.
@@ -68,8 +73,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private String parseBearerToken(HttpServletRequest request) {
         // Http 요청의 헤더를 파싱해 Bearer 토큰을 리턴한다.
+        System.out.println("여기서 헤더 정보값은 들어오려나?"+request.getHeader("Authentication"));
         String bearerToken = request.getHeader("Authorization");
-
+        System.out.println("여기서 뭐하는데?"+bearerToken);
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
         }

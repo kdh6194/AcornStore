@@ -16,20 +16,41 @@ import java.util.Date;
 @Slf4j
 @Service
 public class JwtService {
-    @Value("${spring.jasypt.properties.encrypted-secretKey}")
+    @Value("#{encryptedSecretKey}")
     private String secretKey;
 
     public String create(UserDTO userDTO){
-        Date expireAt = Date.from(Instant.now().plus(1, ChronoUnit.DAYS));
+        Date expireAt = Date.from(Instant.now().plus(2, ChronoUnit.HOURS));
+        String issuer = "Acorn";
+        String audience = "AcornUsers";
+        String subject = "userToken";
+
+        Claims claims = Jwts.claims().setSubject(subject);
+        claims.put("userId", String.valueOf(userDTO.getId()));
+        claims.put("email", userDTO.getEmail());
 
         return Jwts.builder()
-                .signWith(SignatureAlgorithm.HS512,secretKey)
-                .setSubject(String.valueOf(userDTO.getId()))
-                .setIssuer("Acorn")
+                .setClaims(claims)
+                .setIssuer(issuer)
+                .setAudience(audience)
                 .setIssuedAt(new Date())
                 .setExpiration(expireAt)
+                .signWith(SignatureAlgorithm.HS512, secretKey)
                 .compact();
+
     }
+
+//    public String createRefreshToken(UserDTO userDTO) {
+//        Date expireAt = Date.from(Instant.now().plus(10,ChronoUnit.DAYS));
+//
+//        return Jwts.builder()
+//                .signWith(SignatureAlgorithm.HS512, secretKey)
+//                .setSubject(String.valueOf(userDTO.getId()))
+//                .setIssuer("Acorn")
+//                .setIssuedAt(new Date())
+//                .setExpiration(expireAt)
+//                .compact();
+//    }
 
     public String validateAndGetUserId(String token){
         try {
@@ -38,7 +59,19 @@ public class JwtService {
                     .parseClaimsJws(token)
                     .getBody();
 
+            String issuer = claims.getIssuer();
+            String audience = claims.getAudience();
+
+            if (!"Acorn".equals(issuer)) {
+                throw new JwtException("Invalid issuer");
+            }
+
+            if (!"AcornUsers".equals(audience)) {
+                throw new JwtException("Invalid audience");
+            }
+
             return claims.getSubject();
+
         }catch (ExpiredJwtException e) {
             // 토큰이 만료되었을 때의 예외 처리
             log.error("An error occurred: {}", token);
@@ -70,3 +103,34 @@ public class JwtService {
 
 
 }
+
+//    Date expireAt = Date.from(Instant.now().plus(1, ChronoUnit.DAYS));
+//         만료 기간을 2시간 후로 설정하는 로직
+//        return Jwts.builder()
+//                .signWith(SignatureAlgorithm.HS512,secretKey)
+//                .setSubject(String.valueOf(userDTO.getId()))
+//                .setIssuer("Acorn")
+//                .setIssuedAt(new Date())
+//                .setExpiration(expireAt)
+//                .compact();
+
+
+//  try{
+//  Jws<Claims> jws = Jwts.parser()
+//            .setSigningKey(secretKey)
+//            .parseClaimsJws(token);
+//
+//    // We can trust this JWT
+//    Claims claims = jws.getBody();
+//
+//    String issuer = claims.getIssuer();
+//    String audience = claims.getAudience();
+//
+//    if (!"Acorn".equals(issuer)) {
+//        throw new JwtException("Invalid issuer");
+//    }
+//
+//    if (!"AcornUsers".equals(audience)) {
+//        throw new JwtException("Invalid audience");
+//    }
+//  }

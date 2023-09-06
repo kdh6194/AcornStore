@@ -24,8 +24,8 @@
                     <h1><img src="/images/logo.jpg" alt=""></h1>
 
                     <!--로그인 인풋-->
-                    <form class="login__input" action="/auth/signin" method="post">
-                        <input type="text" name="username" placeholder="유저네임" required="required" />
+                    <form class="login__input" action="/auth/login" method="post" enctype="application/x-www-form-urlencoded">
+                        <input type="text" name="email" placeholder="유저네임" required="required" />
                         <input type="password" name="password" placeholder="비밀번호" required="required" />
                         <button>로그인</button>
                     </form>
@@ -46,7 +46,7 @@
                             <span>Google로 로그인</span>
                         </button>
                         <button onclick="javascript:location.href='/oauth2/authorization/naver'">
-                            <i class="fa-solid fa-n"></i>
+                            <i class="fa-solid fa-n" style="color: #0aeb42;"></i>
                             <span>Naver로 로그인</span>
                         </button>
                     </div>
