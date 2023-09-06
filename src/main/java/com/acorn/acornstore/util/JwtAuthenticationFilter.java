@@ -39,7 +39,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         try {
-            System.out.println("response 헤더에 저장한 토큰"+response.getHeader("Authorization"));
             System.out.println("request 헤더에 저장한 토큰"+request.getHeader("Authorization"));
             // 요청에서 토큰 가져오기.
             String token = parseBearerToken(request);
