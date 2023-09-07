@@ -44,7 +44,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests(authorizeRequests ->
                         authorizeRequests
-                                .antMatchers("/", "/auth/**", "/oauth2/**").permitAll()
+                                .antMatchers( "/auth/**", "/oauth2/**").permitAll()
                                 .anyRequest().authenticated());
 
         // OAuth2 로그인 설정

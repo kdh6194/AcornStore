@@ -20,7 +20,7 @@ public class JwtService {
     private String secretKey;
 
     public String create(UserDTO userDTO){
-        Date expireAt = Date.from(Instant.now().plus(2, ChronoUnit.HOURS));
+        Date expireAt = Date.from(Instant.now().plus(2, ChronoUnit.HOURS));// 만료 기간을 2시간 후로 설정하는 로직
         String issuer = "Acorn";
         String audience = "AcornUsers";
         String subject = "userToken";
@@ -62,20 +62,11 @@ public class JwtService {
                     .parseClaimsJws(token)
                     .getBody();
 
-            String issuer = claims.getIssuer();
-            String audience = claims.getAudience();
+            String id = claims.get("userId",String.class);
+            String email = claims.get("email",String.class);;
 
-            if (!"Acorn".equals(issuer)) {
-                throw new JwtException("Invalid issuer");
-            }
 
-            if (!"AcornUsers".equals(audience)) {
-                throw new JwtException("Invalid audience");
-            }
-            System.out.println("토큰클레임 " + claims.getSubject());
-
-            //return claims.getSubject();
-            return (String)claims.get("userId");
+            return id +","+ email;
 
         }catch (ExpiredJwtException e) {
             // 토큰이 만료되었을 때의 예외 처리
@@ -110,7 +101,7 @@ public class JwtService {
 }
 
 //    Date expireAt = Date.from(Instant.now().plus(1, ChronoUnit.DAYS));
-//         만료 기간을 2시간 후로 설정하는 로직
+
 //        return Jwts.builder()
 //                .signWith(SignatureAlgorithm.HS512,secretKey)
 //                .setSubject(String.valueOf(userDTO.getId()))
@@ -120,22 +111,46 @@ public class JwtService {
 //                .compact();
 
 
-//  try{
-//  Jws<Claims> jws = Jwts.parser()
-//            .setSigningKey(secretKey)
-//            .parseClaimsJws(token);
+
+//    public Map<String, String> validateAndExtractUserDetails(String token) {
+//        try {
+//            Claims claims = Jwts.parser()
+//                    .setSigningKey(secretKey)
+//                    .parseClaimsJws(token)
+//                    .getBody();
 //
-//    // We can trust this JWT
-//    Claims claims = jws.getBody();
+//            String id = claims.get("id", String.class); // 'id'라는 이름의 claim 값을 문자열로 가져옵니다.
+//            String email = claims.get("email", String.class); // 'email'이라는 이름의 claim 값을 문자열로 가져옵니다.
 //
-//    String issuer = claims.getIssuer();
-//    String audience = claims.getAudience();
+//            String issuer = claims.getIssuer();
+//            String audience = claims.getAudience();
 //
-//    if (!"Acorn".equals(issuer)) {
-//        throw new JwtException("Invalid issuer");
+//            if (!"Acorn".equals(issuer)) {
+//                throw new JwtException("Invalid issuer");
+//            }
+//
+//            if (!"AcornUsers".equals(audience)) {
+//                throw new JwtException("Invalid audience");
+//            }
+//            System.out.println("토큰클레임 " + claims.getSubject());
+
+//            Map<String, String> userDetails = new HashMap<>();
+//            userDetails.put("id", id);
+//            userDetails.put("email", email);
+//
+//            return userDetails;
+//
+//        } catch (ExpiredJwtException e) {
+//            // 토큰이 만료되었을 때의 예외 처리
+//            log.error("An error occurred: {}", token);
+//            throw new RuntimeException("Token has expired");
+//        } catch (MalformedJwtException e) {
+//            // 토큰이 유효하지 않은 형식일 때의 예외 처리
+//            log.error("An error occurred: {}",token);
+//            throw new RuntimeException("Malformed JWT");
+//        } catch (SignatureException e) {
+//            // 서명이 올바르지 않을 때의 예외 처리
+//            log.error("An error occurred: {}", token);
+//            throw new RuntimeException("JWT signature validation failed");
+//        }
 //    }
-//
-//    if (!"AcornUsers".equals(audience)) {
-//        throw new JwtException("Invalid audience");
-//    }
-//  }
