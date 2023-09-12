@@ -22,8 +22,9 @@ public class ProductImage extends BaseTimeEntity {
     private Product product;
 
     private String productImageUrl; // 이미지 경로를 문자열로 저장
-    public ProductImage(String imageUrl) {
+    public ProductImage(String imageUrl, Product product) {
         this();
+        this.product = product;
         this.productImageUrl = imageUrl;
     }
 
