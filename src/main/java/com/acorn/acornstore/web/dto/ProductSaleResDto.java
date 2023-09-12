@@ -16,5 +16,6 @@ public class ProductSaleResDto {
     private List<String> productImageUrls; // s3에서 이미지 경로
     private String productDetail;
     private LocalDate closingAt; // 판매 종료일
+    private String productStatus; // 상품 상태 추가
 
 }

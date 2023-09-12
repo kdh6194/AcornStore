@@ -24,7 +24,7 @@ public class Product extends BaseTimeEntity{
     private int productPrice;
     private int productQuantity;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<ProductImage> images = new ArrayList<>();  //productImages;
 
     private String productDetail;
@@ -32,11 +32,15 @@ public class Product extends BaseTimeEntity{
     private LocalDate closingAt; // 판매 종료
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "user_id")
     private User user;  // 등록한 멤버 (판매자 또는 구매자)
 
     // @OneToMany(mappedBy="product", cascade=CascadeType.ALL)
     // private List<Order> orders;  // 해당 상품에 대한 모든 주문들
+
+    @Column(name = "product_status")
+    @Enumerated(EnumType.STRING)
+    private ProductStatus productStatus;
 
     @CreatedDate
     private LocalDateTime createdAt;
