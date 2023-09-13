@@ -39,8 +39,7 @@ public class UserController {
     }
 
     @PostMapping(value="/signup", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Map<String,String>> signUp(@Valid @ModelAttribute SignUpDTO signUpDTO, @RequestParam("profileImg")MultipartFile img) {
-        signUpDTO.setProfileImg(img);
+    public ResponseEntity<Map<String,String>> signUp(@Valid @ModelAttribute SignUpDTO signUpDTO) {
         System.out.println("받아온 유저 정보" + signUpDTO.getEmail());
         User isSignUp = userService.signUp(signUpDTO);
         System.out.println("가입한 유저 정보" + isSignUp.getEmail());
