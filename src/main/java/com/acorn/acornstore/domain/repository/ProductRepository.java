@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
@@ -24,4 +25,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Modifying
     @Query("update Product p set p.productStatus = :status where p.closingAt < :now")
     int updateStatusForPastProducts(@Param("status") ProductStatus status, @Param("now") LocalDate now);
+
+    Optional<Product> findByProductId(Long id);
 }
