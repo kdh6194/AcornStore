@@ -17,6 +17,8 @@ import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequest
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.Http403ForbiddenEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.web.filter.CorsFilter;
 
 @Configuration
@@ -44,8 +46,29 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests(authorizeRequests ->
                         authorizeRequests
-                                .antMatchers( "/auth/**", "/oauth2/**").permitAll()
+                                .antMatchers( "/api/**","/auth/**", "/oauth2/**").permitAll()
                                 .anyRequest().authenticated());
+
+//        http
+//                .authorizeRequests()
+//                .antMatchers("/resources/**", "/signup", "/about").permitAll()
+//                .antMatchers("/admin/**").hasRole("ADMIN")
+//                .anyRequest().authenticated()
+//                .and()
+//                // ...
+//                .formLogin().loginPage("/login").permitAll()
+//                .and()
+//                // Here we are configuring Remember-Me feature.
+//                .rememberMe().key("uniqueAndSecret")
+//                // Persistent token based remember-me.
+//                // It will create a new auto-generated repository using specified data source.
+//                // If you want to use custom token repository then uncomment the below line.
+//                //.tokenRepository(persistentTokenRepository())
+//                .tokenValiditySeconds(2419200)  // Token is valid for 4 weeks.
+//                .userDetailsService(userDetailsService);
+
+        http.csrf().disable();
+        http.headers().frameOptions().disable();
 
         // OAuth2 로그인 설정
         http.oauth2Login(oauth2Login ->
@@ -72,6 +95,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
+
+//    @Bean
+//    public PersistentTokenRepository persistentTokenRepository() {
+//        JdbcTokenRepositoryImpl db = new JdbcTokenRepositoryImpl();
+//        db.setDataSource(db.getDataSource());
+//        return db;
+//    }
 }
 
 //http.headers().frameOptions().sameOrigin()

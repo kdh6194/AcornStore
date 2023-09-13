@@ -21,6 +21,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -49,16 +50,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // 토큰 검사하기. JWT이므로 인가 서버에 요청 하지 않고도 검증 가능.
             if (token != null && !token.equalsIgnoreCase("null")) {
                 // userId 가져오기. 위조 된 경우 예외 처리 된다.
-                String userId = jwtService.validateAndGetUserId(token);
-                String email = jwtService.validateAndGetUserId(token);
+                Map<String,String> userInfo = jwtService.validateAndGetUserInfo(token);
+//                String email = jwtService.validateAndGetEmail(token);
+                String userId = userInfo.get("userId");
+                String email = userInfo.get("email");
                 log.info("Authenticated user ID : " + userId );
-                UserDetails userDetails = new CustomUserDetails(userId, email);
+                UserDetails userDetails = new CustomUserDetails(userId,email);
                 // 인증 완료; SecurityContextHolder에 등록해야 인증된 사용자라고 생각한다.
                 AbstractAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         userDetails, // 인증된 사용자의 정보. 문자열이 아니어도 아무거나 넣을 수 있다. 보통 UserDetails라는 오브젝트를 넣는데, 우리는 안 만들었음.
                         null, //
                         AuthorityUtils.NO_AUTHORITIES
                 );
+                if (authentication.getPrincipal() instanceof CustomUserDetails) {
+                    CustomUserDetails userDetailsInToken = (CustomUserDetails) authentication.getPrincipal();
+                    log.info("Username: " + userDetailsInToken.getUsername());
+                    log.info("userId: " + userDetailsInToken.getId());
+                }
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
                 securityContext.setAuthentication(authentication);
