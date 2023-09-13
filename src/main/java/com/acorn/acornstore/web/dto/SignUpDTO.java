@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.lang.Nullable;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -18,5 +20,5 @@ public class SignUpDTO {
     private String gender;
     private String about_me;
     @Nullable
-    private MultipartFile profileImg;
+    private List<MultipartFile> profileImg;
 }

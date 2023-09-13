@@ -1,6 +1,9 @@
 package com.acorn.acornstore.service;
 
+import com.acorn.acornstore.domain.ProductImage;
 import com.acorn.acornstore.domain.User;
+import com.acorn.acornstore.domain.UserProfileImage;
+import com.acorn.acornstore.domain.UserStatus;
 import com.acorn.acornstore.domain.repository.UserRepository;
 import com.acorn.acornstore.web.dto.SignUpDTO;
 import com.acorn.acornstore.web.dto.UserDTO;
@@ -12,10 +15,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -24,8 +31,8 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
-//    private final AuthenticationManager authenticationManager;
-
+    private final S3Uploader s3Uploader;
+    private final String POST_IMAGE_DIR = "newUser";
     // 로그인 실패시 동작하도록 만든 로직 변수
     private Map<String, Integer> loginFailures = new HashMap<>();
     private Map<String, LocalDateTime> lockoutTimes = new HashMap<>();
@@ -44,6 +51,12 @@ public class UserService {
         }
         String email = userDTO.getEmail();
         String password = userDTO.getPassword();
+
+        if (UserStatus.DELETED.name().equals(userDTO.getUserStatus())) {
+            String userStatusMessage = UserStatus.valueOf(userDTO.getUserStatus()).getMessage();
+            System.out.println("현재 회원 상태 : " + userStatusMessage);
+            throw new RuntimeException("This account has been deleted.");
+        }
 
         if (isLockedOut(email)) {
             throw new RuntimeException("Account is locked. Please try again later.");
@@ -79,7 +92,7 @@ public class UserService {
             String address = signUpDTO.getAddress();
             String gender = signUpDTO.getGender();
             String about_me = signUpDTO.getAbout_me();
-            MultipartFile profileImg = signUpDTO.getProfileImg();
+            List<MultipartFile> profileImg = signUpDTO.getProfileImg();
 
         if(userRepository.existsByEmail(email)){
             log.error("An error occurred: {}", email);
@@ -93,6 +106,12 @@ public class UserService {
 
         String encryptedPassword = passwordEncoder.encode(password);
 
+        List<String> imageUrls = s3Uploader.upload(signUpDTO.getProfileImg(), POST_IMAGE_DIR);
+        for(String img : imageUrls){
+            System.out.println("순서대로이미지주소"+img);
+        }
+
+
         User newUser = User.builder()
                 .email(email)
                 .password(encryptedPassword)
@@ -100,8 +119,17 @@ public class UserService {
                 .address(address)
                 .gender(gender)
                 .about_me(about_me)
-                .profileImg(String.valueOf(profileImg))
                 .build();
+
+        List<UserProfileImage> profileImages = imageUrls.stream()
+                .map(imageUrl -> new UserProfileImage(imageUrl, newUser))
+                .collect(Collectors.toList());
+
+        newUser.setProfileImages(profileImages);  // Add images to the user
+
+        for (UserProfileImage userProfileImage : profileImages) {
+            userProfileImage.setUser(newUser);
+        }
 
         return userRepository.save(newUser);
     }
@@ -160,6 +188,14 @@ public class UserService {
         return  pattern.matcher(password).matches() &&
                 (hasUpperCase && hasLowerCase && hasDigit &&
                         !password.contains(" "));
+    }
+
+    @Transactional
+    public void deleteUser(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new RuntimeException("User not found")
+        );
+        user.setUserStatus(UserStatus.DELETED);
     }
 
 }
