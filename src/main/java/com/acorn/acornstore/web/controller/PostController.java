@@ -2,7 +2,6 @@ package com.acorn.acornstore.web.controller;
 
 import com.acorn.acornstore.domain.Product;
 import com.acorn.acornstore.service.ShowProductService;
-import com.acorn.acornstore.web.dto.ProductSaleResDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -26,8 +25,21 @@ public class PostController {
     private final ShowProductService showProductService;
 
     @GetMapping("/list")
-    public String list(@RequestParam(defaultValue = "0") int page, Model model) {
-        Page<Product> products = showProductService.showList(page);
+    public String list(@RequestParam(defaultValue = "") String name,
+                       @RequestParam(defaultValue = "") String category,
+                       @RequestParam(defaultValue = "0") int page, Model model) {
+        Page<Product> products;
+
+        if (!name.isEmpty() && !category.isEmpty()) {
+            products = showProductService.searchAndFilter(name, category, page);
+        } else if (!name.isEmpty()) {
+            products = showProductService.searchByProductName(name, page);
+        } else if (!category.isEmpty()) {
+            products = showProductService.filterByCategory(category, page);
+        } else {
+            products = showProductService.showList(page);
+        }
+
 
         if (page < 0 || page >= products.getTotalPages()) {
             return "redirect:/api/list"; // 유효하지 않다면 첫 번째 페이지로 리다이렉트
@@ -54,12 +66,6 @@ public class PostController {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid product Id:" + id));
         model.addAttribute("product", product);
         return "view";
-    }
-
-    @GetMapping("/cart")
-    public String cart(@AuthenticationPrincipal String userId, Model model) {
-
-        return "cart";
     }
 
     @GetMapping("/order")

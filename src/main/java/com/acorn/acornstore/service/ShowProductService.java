@@ -36,4 +36,31 @@ public class ShowProductService {
         return productRepository.findById(id);
     }
 
+
+    @Transactional(readOnly = true)
+    public Page<Product> searchByProductName(String productName,int page){
+        int size = 10;
+        Sort sort = Sort.by("productId").ascending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        return productRepository.findByProductNameContaining(productName, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Product> filterByCategory(String categoryName,int page){
+        int size = 10;
+        Sort sort = Sort.by("productId").ascending();
+        Pageable pageable = PageRequest.of(page,size ,sort);
+
+        return productRepository.findByCategoryName(categoryName ,pageable);
+    }
+
+    @Transactional(readOnly=true)
+    public Page<Product> searchAndFilter(String productName,String categoryName,int page){
+        int size=10;
+        Sort sort=Sort.by("productId").ascending();
+        Pageable pageable=PageRequest.of(page,size ,sort);
+
+        return productRepository.findByProductNameContainingAndCategoryName(productName ,categoryName ,pageable);
+    }
 }
