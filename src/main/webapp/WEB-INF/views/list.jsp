@@ -39,32 +39,23 @@
     </header>
     <main id="product">
         <section class="list">
-            <form action="/products" method="get">
-                <label for="categoryName">Category:</label>
-                <select name="categoryName" id="categoryName">
+            <form action="/api/list" method="get">
+                <label for="name">Search:</label>
+                <input type="text" id="name" name="name" />
+
+                <label for="category">Category:</label>
+                <select name="category" id="category">
                     <option value="">All</option> <!-- Option for showing all products -->
                     <option value="electronics">Electronics</option>
                     <option value="clothing">Clothing</option>
                     <!-- Add more options for other categories as needed -->
                 </select>
 
-                <button type="submit">Filter</button> <!-- Submit button to apply the category filter -->
+                <button type="submit">Search and Filter</button>
             </form>
-<%--            <ul class="sort">--%>
-<%--                <!-- 방법을 type로 하여 각각 다르게 sql문 보내기 -->--%>
-<%--                <li><a href="/Kmarket1/product/list.do?pg=1&prodCate1=${prodCate1}&type=1"--%>
-<%--                       class="on">판매많은순</a></li>--%>
-<%--                <li><a href="/Kmarket1/product/list.do?pg=1&prodCate1=${prodCate1}&type=2"--%>
-<%--                >낮은가격순</a></li>--%>
-<%--                <li><a href="/Kmarket1/product/list.do?pg=1&prodCate1=${prodCate1}&type=3"--%>
-<%--                >높은가격순</a></li>--%>
-<%--                <li><a href="/Kmarket1/product/list.do?pg=1&prodCate1=${prodCate1}&type=4"--%>
-<%--                >평점높은순</a></li>--%>
-<%--                <li><a href="/Kmarket1/product/list.do?pg=1&prodCate1=${prodCate1}&type=5"--%>
-<%--                >후기많은순</a></li>--%>
-<%--                <li><a href="/Kmarket1/product/list.do?pg=1&prodCate1=${prodCate1}&type=6"--%>
-<%--                >최근등록순</a></li>--%>
-<%--            </ul>--%>
+            <ul class="sort">
+
+            </ul>
 <h1>Product List</h1>
 <table border="0">
     <tbody>

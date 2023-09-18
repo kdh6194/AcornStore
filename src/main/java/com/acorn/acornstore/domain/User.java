@@ -38,7 +38,8 @@ public class User extends BaseTimeEntity {
     @Column(name = "user_status")
     @Enumerated(EnumType.STRING)
     private UserStatus userStatus;
-
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Cart cart;
     public void setProfileImages(List<UserProfileImage> profileImages) {
         this.profileImages = profileImages;
     }
@@ -47,3 +48,4 @@ public class User extends BaseTimeEntity {
         this.userStatus = userStatus;
     }
 }
+

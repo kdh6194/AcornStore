@@ -3,6 +3,8 @@ package com.acorn.acornstore.domain.repository;
 import com.acorn.acornstore.domain.Product;
 import com.acorn.acornstore.domain.ProductStatus;
 import com.acorn.acornstore.domain.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -26,5 +28,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("update Product p set p.productStatus = :status where p.closingAt < :now")
     int updateStatusForPastProducts(@Param("status") ProductStatus status, @Param("now") LocalDate now);
 
-    Optional<Product> findByProductId(Long id);
+    Page<Product> findByProductNameContaining(String productName, Pageable pageable);
+    Page<Product> findByCategoryName(String categoryName, Pageable pageable);
+    Page<Product> findByProductNameContainingAndCategoryName(String productName, String categoryName, Pageable pageable);
 }
